@@ -85,10 +85,13 @@ object ReflectionUtil {
     getters(implicitly[TypeTag[T]].tpe)
   }
 
-  /** Returns the type of the parameters of the given method */
+  /** Returns the type of the parameters of the given method.
+    * The method must exist, otherwise `IllegalArgumentException` is thrown. */
   def methodParamTypes(tpe: Type, methodName: String): Seq[Type] = TypeTag.synchronized {
-    val method = tpe.member(newTermName(methodName)).asMethod
-    method.typeSignatureIn(tpe).asInstanceOf[MethodType].params.map(_.typeSignature)
+    val member = tpe.member(newTermName(methodName))
+    require(member != NoSymbol, s"Member $methodName not found in $tpe")
+    require(member.isMethod, s"Member $methodName of type $tpe is not a method")
+    member.asMethod.typeSignatureIn(tpe).asInstanceOf[MethodType].params.map(_.typeSignature)
   }
 
   /** Returns a list of names and parameter types of 1-argument public methods of a Scala type,
