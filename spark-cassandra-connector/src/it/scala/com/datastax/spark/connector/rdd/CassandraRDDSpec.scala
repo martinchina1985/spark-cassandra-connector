@@ -633,7 +633,7 @@ class CassandraRDDSpec extends SparkCassandraITFlatSpecBase {
       session.execute(s"""TRUNCATE "$ks".write_time_ttl_test""")
       session.execute(s"""INSERT INTO "$ks".write_time_ttl_test (id, value, value2) VALUES (1, 'test', 'test2') USING TTL $ttl""")
     }
-    implicit val mapper = new DefaultColumnMapper[TTLClass](Map("ttlOfValue" -> "value".ttl.cqlValueName))
+    implicit val mapper = new DefaultColumnMapper[TTLClass](Map("ttlOfValue" -> "value".ttl.selectedAs))
     val results = sc.cassandraTable[TTLClass](ks, "write_time_ttl_test")
       .select("id", "value", "value".ttl).collect().headOption
     results.isDefined should be (true)
