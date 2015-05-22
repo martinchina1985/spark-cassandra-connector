@@ -120,11 +120,7 @@ private[connector] class GettableDataToMappedTypeConverter[T : TypeTag : ColumnM
     columnRef match {
       case ColumnName(columnName, _) =>
         structDef.columnByName(columnName).columnType
-      case TTL(_, _) =>
-        BigIntType
-      case WriteTime(_, _) =>
-        BigIntType
-      case RowCountRef =>
+      case TTL(_, _) | WriteTime(_, _) | RowCountRef =>
         BigIntType
     }
   }
