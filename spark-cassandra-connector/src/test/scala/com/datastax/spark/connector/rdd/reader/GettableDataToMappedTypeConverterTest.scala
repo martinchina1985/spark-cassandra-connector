@@ -1,7 +1,5 @@
 package com.datastax.spark.connector.rdd.reader
 
-import scala.beans.BeanProperty
-
 import org.apache.commons.lang3.SerializationUtils
 import org.scalatest.{Matchers, FlatSpec}
 
@@ -239,11 +237,13 @@ class GettableDataToMappedTypeConverterTest extends FlatSpec with Matchers {
   }
 
   class UserBean {
-    @BeanProperty
-    var login: String = null
+    private[this] var login: String = null
+    def getLogin: String = login
+    def setLogin(login: String): Unit = { this.login = login }
 
-    @BeanProperty
-    var password: String = null
+    private[this] var password: String = null
+    def getPassword: String = password
+    def setPassword(password: String): Unit = { this.password = password }
   }
 
   it should "convert a CassandraRow to a JavaBean" in {
@@ -251,26 +251,29 @@ class GettableDataToMappedTypeConverterTest extends FlatSpec with Matchers {
     val row = CassandraRow.fromMap(Map("login" -> "foo", "password" -> "bar"))
     val converter = new GettableDataToMappedTypeConverter[UserBean](userTable, userTable.columnRefs)
     val user = converter.convert(row)
-    user.login shouldBe "foo"
-    user.password shouldBe "bar"
+    user.getLogin shouldBe "foo"
+    user.getPassword shouldBe "bar"
   }
 
   class AddressBean {
-    @BeanProperty
-    var street: String = null
+    private[this] var street: String = null
+    def getStreet: String = street
+    def setStreet(street: String): Unit = { this.street = street }
 
-    @BeanProperty
-    var number: java.lang.Integer = null
+    private[this] var number: java.lang.Integer = null
+    def getNumber: java.lang.Integer = number
+    def setNumber(number: java.lang.Integer): Unit = { this.number = number }
   }
 
   class UserBeanWithAddress {
-    @BeanProperty
-    var login: String = null
+    private[this] var login: String = null
+    def getLogin: String = login
+    def setLogin(login: String): Unit = { this.login = login }
 
-    @BeanProperty
-    var address: AddressBean = null
+    private[this] var address: AddressBean = null
+    def getAddress: AddressBean = address
+    def setAddress(address: AddressBean) = { this.address = address }
   }
-
 
   it should "convert a CassandraRow with UDTs to nested JavaBeans" in {
     implicit val cm: ColumnMapper[UserBeanWithAddress] = new JavaBeanColumnMapper[UserBeanWithAddress]
@@ -279,9 +282,9 @@ class GettableDataToMappedTypeConverterTest extends FlatSpec with Matchers {
     val converter = new GettableDataToMappedTypeConverter[UserBeanWithAddress](
       userTable, userTable.columnRefs)
     val user = converter.convert(row)
-    user.login shouldBe "foo"
-    user.address.street shouldBe "street"
-    user.address.number shouldBe 5
+    user.getLogin shouldBe "foo"
+    user.getAddress.getStreet shouldBe "street"
+    user.getAddress.getNumber shouldBe 5
   }
 
   class UnknownType
